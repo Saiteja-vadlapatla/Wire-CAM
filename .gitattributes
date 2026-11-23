@@ -1,0 +1,6 @@
+* text=auto
+*.WC -text
+*.wc -text
+*.dxf -text
+*.png binary
+*.ico binary

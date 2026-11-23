@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:">
+<title>WireCAM – Wire Cut Programming</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <!-- ======= TOP BAR ======= -->
+  <header id="topbar">
+    <div class="brand"><span class="logo">⟋</span> WireCAM</div>
+    <button class="tb" data-act="new" data-icon="new" title="Start a new empty job (Ctrl+N)">New</button>
+    <button class="tb" data-act="open" data-icon="open" title="Open a DXF drawing, a WireCAM project or a .WC program (Ctrl+O)">Open</button>
+    <button class="tb" data-act="saveProject" data-icon="save" title="Save everything (drawing + wire paths) as a WireCAM project (Ctrl+S)">Save</button>
+    <button class="tb" data-act="exportDxf" data-icon="dxf" title="Save the drawing as DXF">Save DXF</button>
+    <span class="sep"></span>
+    <button class="tb" data-act="undo" data-icon="undo" title="Undo (Ctrl+Z)">Undo</button>
+    <button class="tb" data-act="redo" data-icon="redo" title="Redo (Ctrl+Y)">Redo</button>
+    <button class="tb" data-act="fit" data-icon="fit" title="Show whole drawing (F or Home)">Fit</button>
+    <span class="sep"></span>
+    <nav id="modes">
+      <button class="mode" data-mode="draw"><b>1</b> DRAW</button>
+      <button class="mode" data-mode="path"><b>2</b> WIRE PATH</button>
+      <button class="mode" data-mode="program"><b>3</b> PROGRAM</button>
+    </nav>
+    <span class="grow"></span>
+    <button class="tb" data-act="settings" data-icon="gear" title="Settings">Settings</button>
+    <button class="tb" data-act="help" data-icon="help" title="How to use (F1)">Help</button>
+  </header>
+
+  <div id="main">
+    <!-- ======= LEFT CAD TOOLBAR ======= -->
+    <aside id="tools">
+      <div class="tgroup"><div class="tgt">DRAW</div>
+        <button class="tool" data-tool="select" data-icon="select" title="Select (S / Esc). Drag the blue squares to edit.">Select</button>
+        <button class="tool" data-tool="line" data-icon="line" title="Line (L)">Line</button>
+        <button class="tool" data-tool="rect" data-icon="rect" title="Rectangle (R)">Rectangle</button>
+        <button class="tool" data-tool="circle" data-icon="circle" title="Circle (C)">Circle</button>
+        <button class="tool" data-tool="arc3" data-icon="arc3" title="Arc through 3 points (A)">Arc 3-pt</button>
+        <button class="tool" data-tool="arcc" data-icon="arcc" title="Arc by centre, start, end">Arc centre</button>
+        <button class="tool" data-tool="polygon" data-icon="polygon" title="Regular polygon">Polygon</button>
+        <button class="tool" data-tool="slot" data-icon="slot" title="Slot (obround) by two centres and width">Slot</button>
+        <button class="tool" data-tool="gear" data-icon="gear2" title="Involute spur gear">Gear</button>
+      </div>
+      <div class="tgroup"><div class="tgt">MODIFY</div>
+        <button class="tool" data-tool="trim" data-icon="trim" title="Trim: click the piece to cut away (T)">Trim</button>
+        <button class="tool" data-tool="extend" data-icon="extend" title="Extend a line/arc to the next line (E)">Extend</button>
+        <button class="tool" data-tool="fillet" data-icon="fillet" title="Round a corner (fillet)">Fillet</button>
+        <button class="tool" data-tool="chamfer" data-icon="chamfer" title="Chamfer a corner">Chamfer</button>
+        <button class="tool" data-tool="split" data-icon="split" title="Break a line/arc at a point">Break</button>
+        <button class="tool" data-tool="join" data-icon="join" title="Join pieces into one line / arc">Join</button>
+        <button class="tool" data-tool="offset" data-icon="offset" title="Parallel copy (offset)">Offset</button>
+      </div>
+      <div class="tgroup"><div class="tgt">ARRANGE</div>
+        <button class="tool" data-tool="move" data-icon="move" title="Move selected (M)">Move</button>
+        <button class="tool" data-tool="copy" data-icon="copy" title="Copy selected">Copy</button>
+        <button class="tool" data-tool="rotate" data-icon="rotate" title="Rotate selected">Rotate</button>
+        <button class="tool" data-tool="mirror" data-icon="mirror" title="Mirror selected">Mirror</button>
+        <button class="tool" data-tool="scale" data-icon="scale" title="Scale selected">Scale</button>
+        <button class="tool" data-tool="array" data-icon="array" title="Array: rows/columns or around a centre">Array</button>
+        <button class="tool" data-tool="delete" data-icon="delete" title="Delete selected (Del)">Delete</button>
+      </div>
+      <div class="tgroup"><div class="tgt">CHECK</div>
+        <button class="tool" data-tool="measure" data-icon="measure" title="Measure distance / radius">Measure</button>
+        <button class="tool" data-tool="origin" data-icon="origin" title="Set drawing zero point (X0 Y0)">Set Zero</button>
+      </div>
+    </aside>
+
+    <!-- ======= CANVAS ======= -->
+    <section id="viewwrap">
+      <canvas id="view"></canvas>
+      <div id="consbar" title="Constraints: rules that keep the shape">
+        <span class="cbt">RULES</span>
+        <button class="cbtn" data-tool="c_coincident" title="Coincident – join two points">●<small>Join pts</small></button>
+        <button class="cbtn" data-tool="c_oncurve" title="Point on line / arc">⌖<small>On line</small></button>
+        <button class="cbtn" data-tool="c_midpoint" title="Point in the middle of a line">⊷<small>Middle</small></button>
+        <button class="cbtn" data-tool="c_horizontal" title="Horizontal">H<small>Horiz.</small></button>
+        <button class="cbtn" data-tool="c_vertical" title="Vertical">V<small>Vert.</small></button>
+        <button class="cbtn" data-tool="c_parallel" title="Parallel">∥<small>Parallel</small></button>
+        <button class="cbtn" data-tool="c_perpendicular" title="Perpendicular (90°)">⊥<small>Square</small></button>
+        <button class="cbtn" data-tool="c_tangent" title="Tangent">◡<small>Tangent</small></button>
+        <button class="cbtn" data-tool="c_equal" title="Equal length / equal radius">=<small>Equal</small></button>
+        <button class="cbtn" data-tool="c_concentric" title="Concentric – same centre">◎<small>Same ctr</small></button>
+        <button class="cbtn" data-tool="c_symmetric" title="Symmetric about a line">⇹<small>Symmetric</small></button>
+        <button class="cbtn" data-tool="c_fix" title="Fix / lock in place">🔒<small>Fix</small></button>
+        <span class="cbs"></span>
+        <button class="cbtn dim" data-tool="c_dim" title="Dimension – drives the size">↔<small>Size</small></button>
+        <button class="cbtn" data-act2="auto" title="Auto-constrain the selection or whole drawing">✨<small>Auto</small></button>
+      </div>
+      <div id="junctionBox" class="floatbox hidden"></div>
+      <div id="viewbadges">
+        <span id="snapBadge"></span>
+      </div>
+      <div id="emptyHint" class="hidden">
+        <div class="bigicon">📂</div>
+        <div>Open a <b>DXF drawing</b> (button <b>Open</b>) or start drawing with the tools on the left.</div>
+        <div style="margin-top:12px"><button class="btn pri" id="sampleBtn" style="pointer-events:auto">Try a sample drawing</button></div>
+        <div class="small">Mouse wheel = zoom &nbsp;•&nbsp; hold wheel / right button = move view &nbsp;•&nbsp; F = fit</div>
+      </div>
+    </section>
+
+    <!-- ======= RIGHT PANEL ======= -->
+    <aside id="panel">
+      <div id="panel-draw" class="ppage"></div>
+      <div id="panel-path" class="ppage"></div>
+      <div id="panel-program" class="ppage"></div>
+    </aside>
+  </div>
+
+  <!-- ======= BOTTOM: hint + typed input + status ======= -->
+  <footer id="bottombar">
+    <div id="hint"><span id="hintIcon">👉</span><span id="hintText">Ready.</span></div>
+    <div id="cmdwrap">
+      <input id="cmd" type="text" autocomplete="off" spellcheck="false" placeholder="Type values here and press Enter">
+      <button id="cmdGo" title="Apply typed value">OK</button>
+    </div>
+    <div id="status">
+      <span id="coord">X 0.000  Y 0.000</span>
+      <label class="chk" title="Snap to points (F3)"><input type="checkbox" id="snapOn" checked> Snap</label>
+      <label class="chk" title="Only horizontal / vertical lines (F8 or hold Shift)"><input type="checkbox" id="orthoOn"> Ortho</label>
+      <label class="chk" title="Snap to grid"><input type="checkbox" id="gridSnap"> Grid</label>
+    </div>
+  </footer>
+</div>
+
+<div id="toast"></div>
+<div id="modal" class="hidden"><div class="mbox"><div class="mhead"><span id="mtitle"></span><button id="mclose">✕</button></div><div id="mbody"></div><div id="mfoot"></div></div></div>
+<input type="file" id="fileInput" class="hidden">
+
+<script src="js/core.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/sample.js"></script>
+<script src="js/app.js"></script>
+<script src="js/cad.js"></script>
+<script src="js/pathui.js"></script>
+<script src="js/progui.js"></script>
+<script src="js/constraints.js"></script>
+<script src="js/view3d.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

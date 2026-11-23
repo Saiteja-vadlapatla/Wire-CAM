@@ -1,0 +1,58 @@
+WireCAM 1.5 – Wire-cut programming for the Electronica / ELCam controller
+=========================================================================
+
+START
+  1. Unzip this folder anywhere (for example C:\WireCAM or a pen drive).
+  2. Double-click  WireCAM.exe
+     (First time Windows may say "Windows protected your PC" because the
+      program is not signed: click "More info" -> "Run anyway".)
+  No installation and no internet are needed.
+
+THE 3 STEPS (buttons at the top of the screen)
+  1 DRAW        Open a DXF drawing, or draw with the tools on the left
+                (incl. slot, gear, extend, join, scale, array, grip dragging).
+                Purple RULES bar = constraints (coincident, horizontal,
+                vertical, parallel, perpendicular, tangent, equal,
+                concentric, symmetric, fix) and driving dimensions.
+  2 WIRE PATH   1 start point -> 2 lead-in point (dX/dY offset or click any
+                point; if it is off the shape, pick the join point) ->
+                3 click the FIRST line (= direction), choose at every junction
+                -> 4 offset LEFT G41 / RIGHT G42 / none -> 5 passes (purpose +
+                offset D each, default 1 pass D 0.1) -> 6 lead-out: back to
+                start / stop at path end / other point (dX/dY or click) ->
+                7 taper (optional, with RESULT sizes and a 3D view).
+                Passes: closed loop continues around; open path goes back
+                backward (G41/G42 swapped) or straight back to start.
+                Break points on the path: HOLD (M0,
+                then continue) or STOP (cut only up to there + lead-out).
+  3 PROGRAM     Check the red / yellow messages, press PLAY to watch the
+                wire, then SAVE PROGRAM (.WC, e.g. EMT0001.WC).
+  The yellow text at the bottom of the screen always tells you what to do.
+  Press F1 inside the program for the full help.
+
+PROGRAM FORMAT (same as your ELCam programs)
+  - Program zero X0 Y0 = LEAD-IN point of the first cut (set machine zero
+    there). The program starts with G0 to the start point.
+  - Header: G71 G9 G27 G40 G47 G50 G90 G75, then D0=0, D1=<offset>.
+  - Lead-in with G41/G42 D0, offset ON with D1 at the shape, D0 again for
+    the lead-out, then G40, M0.
+  - Arcs: G2 (clockwise) / G3 (anti-clockwise), X Y = end point,
+    I J = centre measured from the arc START point.
+  - Offset D = wire diameter / 2 + spark gap  (0.18/2 + 0.01 = 0.10,
+    slot width 0.20).
+  - Taper:  G51/G52 A<angle> W<plane> Z<guide distance> ... G50
+            or 4-axis G74 Z B T with XY (bottom) and UV (top) on one line:
+            G101 = UV line, G102/G103 = UV arc with centre P Q from the
+            UV start point, closed with G75.
+
+PLEASE CHECK ON THE MACHINE (first time only)
+  - Dry-run / test-cut the first taper job: the meaning of W and Z in
+    G51/G52 and of B in G74 could not be confirmed from the documents.
+    If the taper goes the wrong way, tick "Swap G51 <-> G52".
+  - Program end code is M0 (like ELCam). Change to M2 in 3 PROGRAM if wanted.
+
+FILES
+  *.wcam   WireCAM project (drawing + all wire paths) – use Save / Open.
+  *.WC     machine program.
+  *.dxf    drawings (Open to import, Save DXF to export).
+  Your work is also auto-saved; after a power cut WireCAM offers to restore it.
